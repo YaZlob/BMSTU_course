@@ -10,7 +10,7 @@ from copy import deepcopy
 # puzzle = input("for empty square enter *\n")
 ans = "1 2 3 8 * 4 7 6 5"
 puzzle = "2 8 3 1 6 4 7 * 5"
-
+limit = len(ans.split()) - 1
 
 def convert2matrix(puzzle: str) -> list:
     return [puzzle.split()[i * 3:(i + 1) * 3] for i in range(3)]
@@ -24,18 +24,21 @@ def str_correct(current_puzzle: str, ans=ans):
     return len([1 for i, j in zip(current_puzzle, ans) if i == j and i != " "])
 
 
-def check_correct(current_puzzle: list, ans=ans):
-    count = 0
-    ans_matrix = convert2matrix(ans)
+def check_correct(current_puzzle: list, ans=ans, limit = limit):
+    count, ans_matrix = 0, convert2matrix(ans)
     for i in range(len(ans_matrix)):
         for j in range(len(ans_matrix)):
-            if ans_matrix[i][j] == current_puzzle[i][j]:
+            if ans_matrix[i][j] == current_puzzle[i][j] and current_puzzle[i][j] != "*":
                 count += 1
-    return count
+    return limit - count
 
 
-assert str_correct(puzzle, ans) == 4
+check_matrix = [['2', '8', '3'], ['1', '6', '4'], ['*', '7', '5']]
+check_matrix_1 = [['2', '8', '3'], ['1', '*', '4'], ['7', '6', '5']]
+
+assert check_correct(check_matrix_1) == 3
 assert check_correct(convert2matrix(puzzle), ans) == 4
+assert check_correct(check_matrix) == 5
 
 
 def find_empty_square(current_puzzle: str):
@@ -81,29 +84,34 @@ def all_variance(current_puzzle: str):
     return _
 
 
+def beautiful_print(**matrix):
+    template = "{} " * len(matrix)
+    for row in matrix:
+        pass
+
+
 def step(variance: list, history: list):
     step_correct = [check_correct(i) for i in variance]
-    best = step_correct.index(max(step_correct))
-    if len(history) >= 2 and variance[best] == history[-2]:
+    best = step_correct.index(min(step_correct))
+    if len(history)>=2 and variance[best] == history[-2]:
+        print(step_correct)
         step_correct.pop(best)
-        best = step_correct.index(max(step_correct))
+        best = step_correct.index(min(step_correct)) + 1
+        print(step_correct)
     return variance[best]
 
-
 def loop(current_puzzle: str):
-    correct = str_correct(current_puzzle)
+    correct = check_correct(convert2matrix(current_puzzle))
     steps = []
     steps.append(convert2matrix(current_puzzle))
     iteration = 0
-    while correct != 8:
+    while correct != 0:
         iteration+=1
-        print(iteration)
         variance = all_variance(current_puzzle)
         var = step(variance, steps)
         steps.append(var)
+        correct = check_correct(var)
         current_puzzle = convert2string(var)
-        correct = str_correct(current_puzzle)
     return steps
-
 
 print(loop(puzzle))
