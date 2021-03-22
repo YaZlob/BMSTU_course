@@ -70,7 +70,6 @@ def check_move(current_puzzle: str, limit: int):
 
     return _
 
-
 def all_variance(current_puzzle: str):
     _ = []
     matrix = convert2matrix(current_puzzle)
@@ -83,21 +82,25 @@ def all_variance(current_puzzle: str):
         _.append(temp_matrix)
     return _
 
+def beautiful_print(matrix,test = True):
+    if test:
+        matrix = all_variance(puzzle)
+        template = "{}   " * len(matrix)
+        for elem in zip(*matrix):
+            print(template.format(*elem))
 
-def beautiful_print(**matrix):
     template = "{} " * len(matrix)
-    for row in matrix:
-        pass
+    for row in zip(*matrix):
+        print(template.format(*row))
 
 
+beautiful_print([])
 def step(variance: list, history: list):
     step_correct = [check_correct(i) for i in variance]
     best = step_correct.index(min(step_correct))
     if len(history)>=2 and variance[best] == history[-2]:
-        print(step_correct)
         step_correct.pop(best)
         best = step_correct.index(min(step_correct)) + 1
-        print(step_correct)
     return variance[best]
 
 def loop(current_puzzle: str):
@@ -107,11 +110,15 @@ def loop(current_puzzle: str):
     iteration = 0
     while correct != 0:
         iteration+=1
+        print(f"Iteration number: {iteration}")
         variance = all_variance(current_puzzle)
+        beautiful_print(variance,False)
         var = step(variance, steps)
         steps.append(var)
         correct = check_correct(var)
         current_puzzle = convert2string(var)
     return steps
 
-print(loop(puzzle))
+algoritm_steps = loop(puzzle)
+print("*"*40)
+print(algoritm_steps[-1])
